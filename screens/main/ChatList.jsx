@@ -11,7 +11,7 @@ import {
   Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks';
 import { chatService, firestoreService } from '../../services';
 import { colors } from '../../config/colors';
@@ -27,12 +27,23 @@ const ChatList = ({ navigation }) => {
   // Set navigation options with header right button
   React.useLayoutEffect(() => {
     navigation.setOptions({
+      headerStyle: {
+        backgroundColor: '#ffffff',
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+      headerTitleStyle: {
+        color: '#ef4444',
+        fontSize: 22,
+        fontWeight: 'bold',
+      },
+      headerTintColor: '#111827',
       headerRight: () => (
         <TouchableOpacity
           style={styles.headerButton}
           onPress={handleNewChat}
         >
-          <Ionicons name="create-outline" size={24} color="#ffffff" />
+          <MaterialCommunityIcons name="chat-plus" size={26} color="#ef4444" />
         </TouchableOpacity>
       ),
     });
@@ -212,62 +223,56 @@ const ChatList = ({ navigation }) => {
 
   if (loading) {
     return (
-      <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading chats...</Text>
-        </View>
-      </LinearGradient>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading chats...</Text>
+      </View>
     );
   }
 
   return (
-    <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
-      <View style={styles.container}>
-        
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search chats..."
-          placeholderTextColor="#6b7280"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          clearButtonMode="while-editing"
-        />
+    <View style={styles.container}>
+      
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search chats..."
+        placeholderTextColor="#9ca3af"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        clearButtonMode="while-editing"
+      />
 
-        {filteredChats.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>💬</Text>
-            <Text style={styles.emptyTitle}>No chats yet</Text>
-            <Text style={styles.emptySubtitle}>Start a conversation with someone!</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredChats}
-            renderItem={renderChatItem}
-            keyExtractor={(item) => item.id}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-            }
-            style={styles.chatList}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-      </View>
-    </LinearGradient>
+      {filteredChats.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyEmoji}>💬</Text>
+          <Text style={styles.emptyTitle}>No chats yet</Text>
+          <Text style={styles.emptySubtitle}>Start a conversation with someone!</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredChats}
+          renderItem={renderChatItem}
+          keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          style={styles.chatList}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#ffffff',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
   loadingText: {
     fontSize: 18,
@@ -280,32 +285,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#dc2626',
+    backgroundColor: '#ffffff',
   },
   profileButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#f8fafc',
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileButtonText: {
     fontSize: 20,
+    color: '#374151',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#111827',
   },
   logoutButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#f8fafc',
   },
   logoutButtonText: {
-    color: '#ffffff',
+    color: '#374151',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -314,9 +320,9 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     paddingHorizontal: 20,
     margin: 15,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8fafc',
     fontSize: 16,
-    color: '#374151',
+    color: '#111827',
     borderWidth: 1,
     borderColor: '#e5e7eb',
   },
@@ -333,7 +339,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#374151',
+    color: '#111827',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -364,7 +370,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: colors.primary,
+    backgroundColor: '#f3f4f6',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -375,10 +381,10 @@ const styles = StyleSheet.create({
     borderRadius: 26,
   },
   groupAvatar: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#f3f4f6',
   },
   avatarText: {
-    color: colors.textInverse,
+    color: '#6b7280',
     fontSize: 20,
     fontWeight: '600',
   },
@@ -395,12 +401,12 @@ const styles = StyleSheet.create({
   chatName: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#111827',
     flex: 1,
   },
   timestamp: {
     fontSize: 13,
-    color: '#9ca3af',
+    color: '#6b7280',
     marginLeft: 8,
     fontWeight: '500',
   },
@@ -416,7 +422,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   unreadBadge: {
-    backgroundColor: '#dc2626',
+    backgroundColor: '#ef4444',
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -430,7 +436,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   headerButton: {
-    padding: 12,
+    padding: 5,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
   },
 });
 
