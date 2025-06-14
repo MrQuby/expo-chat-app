@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../hooks';
 import AuthStack from './AuthStack';
-import Home from '../screens/main/Home';
+import MainStack from './MainStack';
 
 const AppNavigator = () => {
   const { user, isInitializing } = useAuth();
@@ -13,7 +13,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      {user ? <Home /> : <AuthStack />}
+      {user ? <MainStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

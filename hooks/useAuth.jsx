@@ -48,25 +48,31 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
-
   const signup = async (userData) => {
     setLoading(true);
     try {
       const result = await authService.signUp(userData.email, userData.password);
       if (result.success) {
-        const user = result.user;
-
-        // Sign out immediately to prevent auto-navigation
-        await authService.signOut();
-
-        // Save user data to Firestore
-        await firestoreService.users.create(user.uid, {
+        const user = result.user;        // Save user data to Firestore BEFORE signing out
+        console.log('Creating user document for:', user.uid);
+        const createResult = await firestoreService.users.create(user.uid, {
           uid: user.uid,
           email: user.email,
           firstName: userData.firstName,
           lastName: userData.lastName,
+          displayName: `${userData.firstName} ${userData.lastName}`,
           fullName: `${userData.firstName} ${userData.lastName}`,
         });
+
+        if (!createResult.success) {
+          console.error('Failed to create user document:', createResult.error);
+          throw new Error('Failed to create user profile');
+        }
+
+        console.log('User document created successfully');
+
+        // Sign out immediately to prevent auto-navigation
+        await authService.signOut();
 
         return { success: true, user };
       } else {
