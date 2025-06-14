@@ -231,15 +231,17 @@ const ChatList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search chats..."
-        placeholderTextColor="#9ca3af"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        clearButtonMode="while-editing"
-      />
+      <View style={styles.searchContainer}>
+        <MaterialCommunityIcons name="magnify" size={20} color="#9ca3af" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          placeholderTextColor="#9ca3af"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          clearButtonMode="while-editing"
+        />
+      </View>
 
       {filteredChats.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -315,16 +317,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  searchInput: {
-    height: 44,
-    borderRadius: 22,
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
+    paddingVertical: 2,
     margin: 15,
     backgroundColor: '#f8fafc',
-    fontSize: 16,
-    color: '#111827',
+    borderRadius: 22,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+    color: '#111827',
   },
   emptyContainer: {
     flex: 1,
@@ -356,7 +367,7 @@ const styles = StyleSheet.create({
   chatItem: {
     flexDirection: 'row',
     padding: 18,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8fafc',
     marginHorizontal: 10,
     marginVertical: 6,
     borderRadius: 16,
