@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#ef4444',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -392,10 +392,10 @@ const styles = StyleSheet.create({
     borderRadius: 26,
   },
   groupAvatar: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#ef4444',
   },
   avatarText: {
-    color: '#6b7280',
+    color: '#ffffff',
     fontSize: 20,
     fontWeight: '600',
   },

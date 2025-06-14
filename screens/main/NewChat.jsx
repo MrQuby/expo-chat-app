@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks';
 import { chatService } from '../../services';
 
@@ -18,6 +19,24 @@ const NewChat = ({ navigation }) => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Set navigation options to match ChatList header
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: '#ffffff',
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+      headerTitleStyle: {
+        color: '#ef4444',
+        fontSize: 22,
+        fontWeight: 'bold',
+      },
+      headerTintColor: '#111827',
+    });
+  }, [navigation]);
+
   useEffect(() => {
     if (user?.uid) {
       loadUsers();
@@ -121,96 +140,91 @@ const NewChat = ({ navigation }) => {
           {item.email}
         </Text>
       </View>
-      
-      <View style={styles.chatIcon}>
-        <Text style={styles.chatIconText}>💬</Text>
-      </View>
     </TouchableOpacity>
   );
 
   if (loading) {
     return (
-      <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading users...</Text>
-        </View>
-      </LinearGradient>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading users...</Text>
+      </View>
     );
   }
 
   return (
-    <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
-      <View style={styles.container}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search users..."
-            placeholderTextColor="#6b7280"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-
-        {filteredUsers.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>👥</Text>
-            <Text style={styles.emptyTitle}>
-              {searchQuery ? 'No users found' : 'No users available'}
-            </Text>
-            <Text style={styles.emptySubtitle}>
-              {searchQuery 
-                ? 'Try a different search term' 
-                : 'Invite friends to join the app!'
-              }
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredUsers}
-            renderItem={renderUserItem}
-            keyExtractor={(item) => item.id}
-            style={styles.userList}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+    <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <MaterialCommunityIcons name="magnify" size={20} color="#9ca3af" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search users..."
+          placeholderTextColor="#9ca3af"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
       </View>
-    </LinearGradient>
+
+      {filteredUsers.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyEmoji}>👥</Text>
+          <Text style={styles.emptyTitle}>
+            {searchQuery ? 'No users found' : 'No users available'}
+          </Text>
+          <Text style={styles.emptySubtitle}>
+            {searchQuery 
+              ? 'Try a different search term' 
+              : 'Invite friends to join the app!'
+            }
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredUsers}
+          renderItem={renderUserItem}
+          keyExtractor={(item) => item.id}
+          style={styles.userList}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#ffffff',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
   loadingText: {
     fontSize: 18,
-    color: '#6b7280',
+    color: '#64748b',
     fontWeight: '500',
   },
   searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    paddingVertical: 2,
+    margin: 15,
+    backgroundColor: '#f8fafc',
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  searchIcon: {
+    marginRight: 12,
   },
   searchInput: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    flex: 1,
+    height: 40,
     fontSize: 16,
-    backgroundColor: '#f9fafb',
+    color: '#111827',
   },
   emptyContainer: {
     flex: 1,
@@ -225,70 +239,57 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#374151',
+    color: '#1e293b',
     marginBottom: 10,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#64748b',
     textAlign: 'center',
     lineHeight: 24,
   },
   userList: {
     flex: 1,
+    paddingHorizontal: 5,
   },
   userItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    backgroundColor: '#ffffff',
+    padding: 18,
+    backgroundColor: '#f8fafc',
     marginHorizontal: 10,
-    marginVertical: 5,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#dc2626',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#ef4444',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 15,
   },
   avatarText: {
     color: '#ffffff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
   },
   userContent: {
     flex: 1,
   },
   userName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 2,
+    color: '#0f172a',
+    marginBottom: 4,
   },
   userEmail: {
-    fontSize: 14,
-    color: '#6b7280',
-  },
-  chatIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  chatIconText: {
-    fontSize: 20,
+    fontSize: 15,
+    color: '#64748b',
   },
 });
 
