@@ -7,10 +7,13 @@ import {
   StyleSheet,
   RefreshControl,
   Alert,
+  TextInput,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../hooks';
 import { chatService, firestoreService } from '../../services';
+import { colors } from '../../config/colors';
 
 const ChatList = ({ navigation }) => {
   const { user, logout } = useAuth();
@@ -130,42 +133,51 @@ const ChatList = ({ navigation }) => {
     const otherUser = users[otherParticipant];
     return otherUser?.displayName || otherUser?.email || 'Unknown User';
   };
+  const renderChatItem = ({ item }) => {
+    const otherParticipant = item.participants.find(id => id !== user.uid);
+    const otherUser = users[otherParticipant];
+    const profileImage = otherUser?.profileImage;
 
-  const renderChatItem = ({ item }) => (
-    <TouchableOpacity style={styles.chatItem} onPress={() => handleChatPress(item)}>
-      <View style={styles.avatarContainer}>
-        <View style={[styles.avatar, item.isGroup && styles.groupAvatar]}>
-          <Text style={styles.avatarText}>
-            {item.isGroup ? '👥' : getChatDisplayName(item).charAt(0).toUpperCase()}
-          </Text>
-        </View>
-      </View>
-      
-      <View style={styles.chatContent}>
-        <View style={styles.chatHeader}>
-          <Text style={styles.chatName} numberOfLines={1}>
-            {getChatDisplayName(item)}
-          </Text>
-          <Text style={styles.timestamp}>
-            {formatTime(item.lastMessageTime)}
-          </Text>
+    return (
+      <TouchableOpacity style={styles.chatItem} onPress={() => handleChatPress(item)}>
+        <View style={styles.avatarContainer}>
+          <View style={[styles.avatar, item.isGroup && styles.groupAvatar]}>
+            {!item.isGroup && profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+            ) : (
+              <Text style={styles.avatarText}>
+                {item.isGroup ? '👥' : getChatDisplayName(item).charAt(0).toUpperCase()}
+              </Text>
+            )}
+          </View>
         </View>
         
-        <View style={styles.lastMessageContainer}>
-          <Text style={styles.lastMessage} numberOfLines={1}>
-            {item.lastMessage || 'No messages yet'}
-          </Text>
-          {(item.unreadCount?.[user.uid] || 0) > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadText}>
-                {item.unreadCount[user.uid]}
-              </Text>
-            </View>
-          )}
+        <View style={styles.chatContent}>
+          <View style={styles.chatHeader}>
+            <Text style={styles.chatName} numberOfLines={1}>
+              {getChatDisplayName(item)}
+            </Text>
+            <Text style={styles.timestamp}>
+              {formatTime(item.lastMessageTime)}
+            </Text>
+          </View>
+          
+          <View style={styles.lastMessageContainer}>
+            <Text style={styles.lastMessage} numberOfLines={1}>
+              {item.lastMessage || 'No messages yet'}
+            </Text>
+            {(item.unreadCount?.[user.uid] || 0) > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadText}>
+                  {item.unreadCount[user.uid]}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
@@ -312,22 +324,27 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     marginRight: 12,
-  },
-  avatar: {
+  },  avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#dc2626',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 25,
   },
   groupAvatar: {
-    backgroundColor: '#059669',
+    backgroundColor: colors.primary,
   },
   avatarText: {
-    color: '#ffffff',
+    color: colors.textInverse,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   chatContent: {
     flex: 1,

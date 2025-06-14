@@ -1,28 +1,48 @@
-// Color Palette for Authentication Screens
+// Modern Messenger-like Color Palette
 
 export const colors = {
-  // Primary Colors
-  primary: '#d63031',           // Main red for buttons and titles
-  primaryLight: '#fab1a0',      // Light red for disabled states
+  // Primary Colors - Red Theme
+  primary: '#e63946',           // Modern vibrant red for accents
+  primaryLight: '#f8f9fa',      // Very light background
+  primaryDark: '#d62828',       // Darker red for active states
+  
+  // Background Colors
+  background: '#ffffff',        // Pure white background
+  backgroundSecondary: '#f8f9fa', // Very light gray
+  backgroundChat: '#f0f0f0',    // Light gray for received messages
+  
+  // Message Colors
+  sentMessage: '#e63946',       // Red for sent messages
+  receivedMessage: '#f0f0f0',   // Light gray for received messages
+  messageText: '#ffffff',       // White text on sent messages
+  receivedText: '#000000',      // Black text on received messages
+  
+  // Text Colors
+  textPrimary: '#000000',       // Black for primary text
+  textSecondary: '#8e8e93',     // Gray for secondary text
+  textTertiary: '#c7c7cc',      // Light gray for timestamps
+  textInverse: '#ffffff',       // White text
   
   // Input Colors
-  inputBackground: '#f8f4f0',   // Warm cream background for inputs
-  inputBorder: '#d4a574',       // Brown border for inputs
-  inputPlaceholder: '#8b5a3c',  // Dark brown for placeholder text
-  inputText: '#2d3436',         // Dark text color
+  inputBackground: '#f0f0f0',   // Light gray background
+  inputBorder: '#e0e0e0',       // Light border
+  inputBorderActive: '#e63946', // Red border when active
+  inputPlaceholder: '#8e8e93',  // Gray placeholder
+  inputText: '#000000',         // Black text
   
-  // Error Colors
-  errorBackground: '#fef2f2',   // Light red background for error inputs
-  errorBorder: '#d63031',       // Red border for error inputs
-  errorText: '#d63031',         // Red text for error messages
+  // UI Elements
+  divider: '#e0e0e0',           // Light gray dividers
+  border: '#e0e0e0',            // Standard border color
+  shadowColor: '#000000',       // Black shadow
   
-  // Secondary Colors
-  accent: '#74b9ff',            // Blue for subtitles
-  background: '#ffffff',        // White background
-  textSecondary: '#636e72',     // Gray for secondary text
+  // Status Colors
+  online: '#34c759',            // Green for online status
+  unread: '#e63946',            // Red for unread indicators
+  notification: '#ff3b30',      // Red notification badge
   
-  // Shadows
-  shadowColor: '#d63031',       // Red shadow for depth
+  // Tab Bar
+  tabActive: '#e63946',         // Red for active tab
+  tabInactive: '#8e8e93',       // Gray for inactive tab
 };
 
 export default colors;
