@@ -77,18 +77,22 @@ const ChatList = ({ navigation }) => {
     if (!user?.uid) {
       Alert.alert('Error', 'You must be logged in to access chats');
       return;
-    }
-
-    const otherParticipants = chat.participants.filter(id => id !== user.uid);
+    }    const otherParticipants = chat.participants.filter(id => id !== user.uid);
     const chatName = chat.isGroup 
       ? chat.chatName 
       : users[otherParticipants[0]]?.displayName || users[otherParticipants[0]]?.email || 'Unknown User';
+    
+    const profileImage = chat.isGroup 
+      ? null 
+      : users[otherParticipants[0]]?.profileImage;
 
     console.log('Navigating to chat:', chat.id, 'with name:', chatName);
     navigation.navigate('ChatRoom', {
       chatId: chat.id,
       chatName,
       isGroup: chat.isGroup,
+      profileImage,
+      fullName: chatName,
     });
   };
 

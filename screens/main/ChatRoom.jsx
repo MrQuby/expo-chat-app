@@ -13,6 +13,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../hooks';
 import { chatService } from '../../services';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ChatRoom = ({ route, navigation }) => {
   const { chatId, chatName, isGroup } = route.params;
@@ -20,6 +21,7 @@ const ChatRoom = ({ route, navigation }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const insets = useSafeAreaInsets();
   useEffect(() => {
     if (!chatId || !user?.uid) return;
 
@@ -156,7 +158,7 @@ const ChatRoom = ({ route, navigation }) => {
       <KeyboardAvoidingView 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={90}
+        keyboardVerticalOffset={60}
       >
         {messages.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -175,7 +177,7 @@ const ChatRoom = ({ route, navigation }) => {
           />
         )}
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { paddingBottom: insets.bottom }]}>
           <TextInput
             style={styles.textInput}
             value={newMessage}
@@ -193,8 +195,8 @@ const ChatRoom = ({ route, navigation }) => {
             <Text style={styles.sendButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+       </KeyboardAvoidingView>
+     </LinearGradient>
   );
 };
 
@@ -312,7 +314,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingTop: 10,
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e5e7eb',
@@ -344,6 +346,9 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  safeArea: {
+    flex: 0,
   },
 });
 
