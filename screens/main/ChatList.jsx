@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks';
 import { chatService, firestoreService } from '../../services';
 import { colors } from '../../config/colors';
@@ -22,6 +23,21 @@ const ChatList = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [users, setUsers] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Set navigation options with header right button
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={handleNewChat}
+        >
+          <Ionicons name="create-outline" size={24} color="#ffffff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     if (!user?.uid) return;
 
@@ -207,18 +223,7 @@ const ChatList = ({ navigation }) => {
   return (
     <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.profileButton} onPress={handleProfile}>
-            <Text style={styles.profileButtonText}>👤</Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.title}>Chats</Text>
-          
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
-
+        
         <TextInput
           style={styles.searchInput}
           placeholder="Search chats..."
@@ -243,12 +248,9 @@ const ChatList = ({ navigation }) => {
               <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
             }
             style={styles.chatList}
+            showsVerticalScrollIndicator={false}
           />
         )}
-
-        <TouchableOpacity style={styles.fab} onPress={handleNewChat}>
-          <Text style={styles.fabText}>💬</Text>
-        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
@@ -308,18 +310,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   searchInput: {
-    height: 40,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    margin: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    height: 44,
+    borderRadius: 22,
+    paddingHorizontal: 20,
+    margin: 15,
+    backgroundColor: '#ffffff',
     fontSize: 16,
     color: '#374151',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
   },
   emptyContainer: {
     flex: 1,
@@ -346,26 +345,25 @@ const styles = StyleSheet.create({
   },
   chatList: {
     flex: 1,
+    paddingHorizontal: 5,
   },
   chatItem: {
     flexDirection: 'row',
-    padding: 15,
+    padding: 18,
     backgroundColor: '#ffffff',
     marginHorizontal: 10,
-    marginVertical: 5,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#f3f4f6',
   },
   avatarContainer: {
-    marginRight: 12,
-  },  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    marginRight: 15,
+  },
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -374,35 +372,37 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 25,
+    borderRadius: 26,
   },
   groupAvatar: {
     backgroundColor: colors.primary,
   },
   avatarText: {
     color: colors.textInverse,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
   },
   chatContent: {
     flex: 1,
+    justifyContent: 'center',
   },
   chatHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   chatName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#374151',
+    color: '#1f2937',
     flex: 1,
   },
   timestamp: {
-    fontSize: 12,
-    color: '#6b7280',
+    fontSize: 13,
+    color: '#9ca3af',
     marginLeft: 8,
+    fontWeight: '500',
   },
   lastMessageContainer: {
     flexDirection: 'row',
@@ -410,42 +410,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lastMessage: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#6b7280',
     flex: 1,
+    lineHeight: 20,
   },
   unreadBadge: {
     backgroundColor: '#dc2626',
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: 10,
   },
   unreadText: {
     color: '#ffffff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#dc2626',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  fabText: {
-    fontSize: 24,
+  headerButton: {
+    padding: 12,
   },
 });
 

@@ -1,10 +1,9 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import ChatList from '../screens/main/ChatList';
+import BottomTabNavigator from './BottomTabNavigator';
 import ChatRoom from '../screens/main/ChatRoom';
 import NewChat from '../screens/main/NewChat';
-import Profile from '../screens/main/Profile';
 
 const Stack = createStackNavigator();
 
@@ -23,11 +22,10 @@ const MainStack = () => {
       }}
     >
       <Stack.Screen 
-        name="ChatList" 
-        component={ChatList} 
+        name="Main" 
+        component={BottomTabNavigator} 
         options={{ 
-          title: 'Chats',
-          headerRight: () => null,
+          headerShown: false,
         }} 
       />
       <Stack.Screen 
@@ -59,11 +57,6 @@ const MainStack = () => {
         name="NewChat" 
         component={NewChat} 
         options={{ title: 'New Chat' }} 
-      />
-      <Stack.Screen 
-        name="Profile" 
-        component={Profile} 
-        options={{ title: 'Profile' }} 
       />
     </Stack.Navigator>
   );
