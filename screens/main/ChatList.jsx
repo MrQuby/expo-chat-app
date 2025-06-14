@@ -21,6 +21,7 @@ const ChatList = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [users, setUsers] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
   useEffect(() => {
     if (!user?.uid) return;
 
@@ -94,10 +95,30 @@ const ChatList = ({ navigation }) => {
   const handleNewChat = () => {
     navigation.navigate('NewChat');
   };
-
   const handleProfile = () => {
     navigation.navigate('Profile');
   };
+
+  const getChatDisplayName = (chat) => {
+    if (chat.isGroup) {
+      return chat.chatName || 'Group Chat';
+    }
+    
+    const otherParticipant = chat.participants.find(id => id !== user.uid);
+    const otherUser = users[otherParticipant];
+    return otherUser?.displayName || otherUser?.email || 'Unknown User';
+  };
+
+  // Filter chats based on search query
+  const filteredChats = chats.filter(chat => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const chatName = getChatDisplayName(chat).toLowerCase();
+    const lastMessage = chat.lastMessage?.text?.toLowerCase() || '';
+    
+    return chatName.includes(query) || lastMessage.includes(query);
+  });
 
   const handleLogout = () => {
     Alert.alert(
@@ -120,19 +141,9 @@ const ChatList = ({ navigation }) => {
     if (diff < 24 * 60 * 60 * 1000) { // Less than 24 hours
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    }
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });    }
   };
 
-  const getChatDisplayName = (chat) => {
-    if (chat.isGroup) {
-      return chat.chatName || 'Group Chat';
-    }
-    
-    const otherParticipant = chat.participants.find(id => id !== user.uid);
-    const otherUser = users[otherParticipant];
-    return otherUser?.displayName || otherUser?.email || 'Unknown User';
-  };
   const renderChatItem = ({ item }) => {
     const otherParticipant = item.participants.find(id => id !== user.uid);
     const otherUser = users[otherParticipant];
@@ -204,7 +215,16 @@ const ChatList = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {chats.length === 0 ? (
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search chats..."
+          placeholderTextColor="#6b7280"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          clearButtonMode="while-editing"
+        />
+
+        {filteredChats.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>💬</Text>
             <Text style={styles.emptyTitle}>No chats yet</Text>
@@ -212,7 +232,7 @@ const ChatList = ({ navigation }) => {
           </View>
         ) : (
           <FlatList
-            data={chats}
+            data={filteredChats}
             renderItem={renderChatItem}
             keyExtractor={(item) => item.id}
             refreshControl={
@@ -282,6 +302,20 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 12,
     fontWeight: '600',
+  },
+  searchInput: {
+    height: 40,
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    margin: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+    color: '#374151',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   emptyContainer: {
     flex: 1,
