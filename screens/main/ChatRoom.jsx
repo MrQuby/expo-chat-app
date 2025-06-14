@@ -9,8 +9,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../hooks';
 import { chatService } from '../../services';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,7 +23,23 @@ const ChatRoom = ({ route, navigation }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   useEffect(() => {
     if (!chatId || !user?.uid) return;
 
@@ -158,7 +176,7 @@ const ChatRoom = ({ route, navigation }) => {
       <KeyboardAvoidingView 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={60}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : (keyboardVisible ? 60 : 0)}
       >
         {messages.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -177,7 +195,7 @@ const ChatRoom = ({ route, navigation }) => {
           />
         )}
 
-        <View style={[styles.inputContainer, { paddingBottom: insets.bottom }]}>
+        <View style={[styles.inputContainer, { paddingBottom: Math.max(insets.bottom, 10) }]}>
           <TextInput
             style={styles.textInput}
             value={newMessage}
@@ -192,7 +210,11 @@ const ChatRoom = ({ route, navigation }) => {
             onPress={sendMessage}
             disabled={!newMessage.trim()}
           >
-            <Text style={styles.sendButtonText}>Send</Text>
+            <Ionicons 
+              name="send" 
+              size={20} 
+              color={!newMessage.trim() ? "#9ca3af" : "#ffffff"} 
+            />
           </TouchableOpacity>
         </View>
        </KeyboardAvoidingView>
@@ -324,7 +346,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1d5db',
     borderRadius: 20,
-    paddingHorizontal: 16,
+    paddingHorizontal: 15,
     paddingVertical: 10,
     marginRight: 10,
     fontSize: 16,
@@ -334,18 +356,13 @@ const styles = StyleSheet.create({
   sendButton: {
     backgroundColor: '#dc2626',
     borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
   sendButtonDisabled: {
     backgroundColor: '#d1d5db',
-  },
-  sendButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   safeArea: {
     flex: 0,
