@@ -10,7 +10,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../../hooks';
 import { firestoreService } from '../../services';
@@ -18,11 +18,32 @@ import { colors } from '../../config/colors';
 
 const Profile = ({ navigation }) => {
   const { user, logout } = useAuth();
-  const [displayName, setDisplayName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [initialDisplayName, setInitialDisplayName] = useState('');
-  const [initialProfileImage, setInitialProfileImage] = useState(null);  useEffect(() => {
+  const [initialFirstName, setInitialFirstName] = useState('');
+  const [initialLastName, setInitialLastName] = useState('');
+  const [initialProfileImage, setInitialProfileImage] = useState(null);
+
+  // Set navigation options to match other screens
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: '#ffffff',
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+      headerTitleStyle: {
+        color: '#ef4444',
+        fontSize: 22,
+        fontWeight: 'bold',
+      },
+      headerTintColor: '#111827',
+    });
+  }, [navigation]);
+
+  useEffect(() => {
     if (user?.uid) {
       loadUserProfile();
     }
@@ -36,10 +57,14 @@ const Profile = ({ navigation }) => {
       const result = await firestoreService.users.get(user.uid);
       
       if (result.success) {
-        const userName = result.data.displayName || '';
+        const userFirstName = result.data.firstName || '';
+        const userLastName = result.data.lastName || '';
         const userImage = result.data.profileImage || null;
-        setDisplayName(userName);
-        setInitialDisplayName(userName);
+        
+        setFirstName(userFirstName);
+        setLastName(userLastName);
+        setInitialFirstName(userFirstName);
+        setInitialLastName(userLastName);
         setProfileImage(userImage);
         setInitialProfileImage(userImage);
       } else {
@@ -55,7 +80,7 @@ const Profile = ({ navigation }) => {
       return;
     }
 
-    const hasNameChanged = displayName.trim() !== initialDisplayName.trim();
+    const hasNameChanged = firstName.trim() !== initialFirstName.trim() || lastName.trim() !== initialLastName.trim();
     const hasImageChanged = profileImage !== initialProfileImage;
 
     if (!hasNameChanged && !hasImageChanged) {
@@ -68,7 +93,9 @@ const Profile = ({ navigation }) => {
     try {
       console.log('Updating profile for user:', user.uid);
       const updateData = {
-        displayName: displayName.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        displayName: `${firstName.trim()} ${lastName.trim()}`.trim(),
       };
 
       if (hasImageChanged) {
@@ -78,7 +105,8 @@ const Profile = ({ navigation }) => {
       const result = await firestoreService.users.update(user.uid, updateData);
 
       if (result.success) {
-        setInitialDisplayName(displayName.trim());
+        setInitialFirstName(firstName.trim());
+        setInitialLastName(lastName.trim());
         setInitialProfileImage(profileImage);
         Alert.alert('Success', 'Profile updated successfully');
       } else {
@@ -175,7 +203,7 @@ const Profile = ({ navigation }) => {
   // Helper function to get user initial
   const getUserInitial = () => {
     try {
-      const name = displayName || user?.email || 'U';
+      const name = firstName + ' ' + lastName || user?.email || 'U';
       const initial = String(name).charAt(0).toUpperCase();
       return initial || 'U';
     } catch (error) {
@@ -210,96 +238,99 @@ const Profile = ({ navigation }) => {
 
   if (!user?.uid) {
     return (
-      <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
-        <View style={styles.content}>
-          <Text style={styles.loadingText}>Loading profile...</Text>
-        </View>
-      </LinearGradient>
+      <View style={styles.content}>
+        <Text style={styles.loadingText}>Loading profile...</Text>
+      </View>
     );
   }
+
   return (
-    <LinearGradient colors={['#fef2f2', '#ffffff', '#fef2f2']} style={styles.gradient}>
-      <KeyboardAvoidingView 
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={styles.content}>
-          {/* Avatar Section */}
-          <View style={styles.avatarContainer}>
-            <TouchableOpacity style={styles.avatarTouchable} onPress={showImagePicker}>
-              <View style={styles.avatar}>
-                {profileImage ? (
-                  <Image source={{ uri: profileImage }} style={styles.avatarImage} />
-                ) : (
-                  <Text style={styles.avatarText}>{getUserInitial()}</Text>
-                )}
-              </View>
-              <View style={styles.cameraIcon}>
-                <Text style={styles.cameraIconText}>📷</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* Info Section */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.email}>{getUserEmail()}</Text>
-            <Text style={styles.userId}>{`ID: ${getUserId()}...`}</Text>
-          </View>
-
-          {/* Form Section */}
-          <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Display Name</Text>
-              <TextInput
-                style={styles.input}
-                value={displayName}
-                onChangeText={setDisplayName}
-                placeholder="Enter your display name"
-                placeholderTextColor="#6b7280"
-                maxLength={50}
-              />
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.content}>
+        {/* Avatar Section */}
+        <View style={styles.avatarContainer}>
+          <TouchableOpacity style={styles.avatarTouchable} onPress={showImagePicker}>
+            <View style={styles.avatar}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarText}>{getUserInitial()}</Text>
+              )}
             </View>
-            <TouchableOpacity
-              style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-              onPress={saveProfile}
-              disabled={loading}
-            >
-              <Text style={styles.saveButtonText}>
-                {loading ? 'Saving...' : 'Save Changes'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutButtonText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
+            <View style={styles.cameraIcon}>
+              <MaterialCommunityIcons name="camera" size={20} color="#ffffff" />
+            </View>
+          </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+
+        {/* Info Section */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.email}>{getUserEmail()}</Text>
+        </View>
+
+        {/* Form Section */}
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>First Name</Text>
+          <TextInput
+            style={styles.input}
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="Enter your first name"
+            placeholderTextColor="#9ca3af"
+            maxLength={50}
+          />
+          <Text style={styles.label}>Last Name</Text>
+          <TextInput
+            style={styles.input}
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Enter your last name"
+            placeholderTextColor="#9ca3af"
+            maxLength={50}
+          />
+          
+          <TouchableOpacity
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={saveProfile}
+            disabled={loading}
+          >
+            <Text style={styles.saveButtonText}>
+              {loading ? 'Saving...' : 'Save Changes'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#ffffff',
   },
   content: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
   },
   loadingText: {
     fontSize: 18,
-    color: '#6b7280',
+    color: '#64748b',
     fontWeight: '500',
     textAlign: 'center',
-  },  avatarContainer: {
+  },
+  avatarContainer: {
     alignItems: 'center',
     marginBottom: 30,
   },
@@ -310,94 +341,69 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.primary,
+    backgroundColor: '#ef4444',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: colors.shadowColor || '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
     overflow: 'hidden',
   },
   avatarImage: {
     width: '100%',
     height: '100%',
     borderRadius: 50,
-  },  avatarText: {
-    color: colors.textInverse || '#ffffff',
+  },
+  avatarText: {
+    color: '#ffffff',
     fontSize: 36,
     fontWeight: '700',
   },
   cameraIcon: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.primary,
+    bottom: 3,
+    right: 3,
+    backgroundColor: '#ef4444',
     borderRadius: 15,
     width: 30,
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.background,
-  },
-  cameraIconText: {
-    fontSize: 14,
+    borderColor: '#ffffff',
   },
   infoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   email: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 5,
-  },
-  userId: {
-    fontSize: 14,
-    color: '#6b7280',
+    color: '#0f172a',
+    marginBottom: 6,
   },
   formContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
     marginBottom: 30,
-  },
-  inputGroup: {
-    marginBottom: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: '#0f172a',
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderColor: '#e5e7eb',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     fontSize: 16,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#ffffff',
+    color: '#111827',
+    marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: '#dc2626',
-    borderRadius: 12,
-    paddingVertical: 15,
+    backgroundColor: '#ef4444',
+    borderRadius: 16,
+    paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#dc2626',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
   },
   saveButtonDisabled: {
     backgroundColor: '#d1d5db',
@@ -411,15 +417,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutButton: {
-    backgroundColor: '#ffffff',
-    borderWidth: 2,
-    borderColor: '#dc2626',
-    borderRadius: 12,
-    paddingHorizontal: 30,
-    paddingVertical: 12,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#ef4444',
+    borderRadius: 16,
+    paddingHorizontal: 40,
+    paddingVertical: 14,
   },
   logoutButtonText: {
-    color: '#dc2626',
+    color: '#ef4444',
     fontSize: 16,
     fontWeight: '600',
   },
